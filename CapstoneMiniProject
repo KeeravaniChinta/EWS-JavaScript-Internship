@@ -1,0 +1,75 @@
+const readline = require("readline");
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+console.log("--- Initializing Inventory System ---");
+const inventory = [
+    { name: "Laptop", price: 800 },
+    { name: "Mouse", price: 25 }
+];
+function getCategory(price) {
+    if (price < 50) {
+        return "Budget";
+    } else if (price >= 200) {
+        return "Premium";
+    } else {
+        return "Standard";
+    }
+}
+function calculateTotal(items) {
+    let total = 0;
+    for (let item of items) {
+        total += item.price;
+    }
+    return total;
+}
+const formatProduct = (item) =>
+    item.name.toUpperCase() + ": $" + item.price;
+rl.question("Enter new product name: ", (nameInput) => {
+    const name = nameInput.trim();
+    rl.question("Enter product price: ", (priceInput) => {
+        const price = Number(priceInput);
+        if (name === "" || priceInput.trim() === "" ||
+            !Number.isFinite(price) || price < 0) {
+            rl.close();
+            return;
+        }
+        inventory.push({ name: name, price: price });
+        console.log("\n--- Processing Inventory Roster (forEach) ---");
+        inventory.forEach((item) => {
+            let category;
+            switch (getCategory(item.price)) {
+                case "Budget":
+                    category = "Budget";
+                    break;
+                case "Standard":
+                    category = "Standard";
+                    break;
+                case "Premium":
+                    category = "Premium";
+                    break;
+            }
+            console.log(
+                "* Item: " + item.name +
+                " ($" + item.price +
+                ") -> Category: " + category
+            );
+        });
+        console.log("\n--- Financial Analytics ---");
+        console.log("Total Inventory Value: $" + calculateTotal(inventory));
+        const affordable = inventory
+            .filter(item => item.price < 200)
+            .map(item => item.name);
+        console.log(
+            "Filtered Affordable Items (Under $200): " +
+            JSON.stringify(affordable).replace(/,/g, ", ")
+        );
+        const report = inventory.map(formatProduct);
+        console.log(
+            "Formatted Report List: " +
+            JSON.stringify(report).replace(/,/g, ", ")
+        );
+        rl.close();
+    });
+});
